@@ -2,6 +2,20 @@ import React, { useState } from "react";
 import "./index.css";
 import axios from "axios";
 
+function formatTime(dateString) {
+  const date = new Date(dateString);
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
+  return date.toLocaleString("en-US", options);
+}
+
 function App() {
   const [trackingData, setTrackingData] = useState({});
 
@@ -19,11 +33,11 @@ function App() {
 
   return (
     <div className="bg-gray-100">
-      {/* <div>
+      <div>
         <button onClick={callAPI}>Call API</button>
         <div>{trackingData.description}</div>
         <div>{trackingData.trackingNumber}</div>
-      </div> */}
+      </div>
       <header>
         <div className="background-0C69F3 p-4 flex justify-center items-center">
           <div className="flex items-center space-x-3">
@@ -92,41 +106,43 @@ function App() {
                 className="w-2/3 max-h-5"
               />
             </div>
+            {/* <div>{trackingData.description}</div>
+            <div>{trackingData.trackingNumber}</div> */}
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Pickup#</p>
-              <p>599185268</p>
+              <p>{trackingData.trackingNumber}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Master Tracking</p>
-              <p>HB78509274U60</p>
+              <p>{trackingData.description}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Canpar Tracking</p>
-              <p>70770262</p>
+              <p>{trackingData.trackingNumber}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Shipment Booked</p>
-              <p>Thur 19 Dec 2022</p>
+              <p>{formatTime(trackingData.actual_pickup)}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Pickup Date</p>
-              <p>Fri 20 Dec 2022</p>
+              <p>{formatTime(trackingData.ship)}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Shipment Type</p>
-              <p>Fri 20 Dec 2022</p>
+              <p>{formatTime(trackingData.actual_tender)}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Package Count</p>
-              <p>3</p>
+              <p>{trackingData.packageDetails}</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Weight </p>
-              <p>20.0lbs</p>
+              <p>PENDING</p>
             </div>
             <div className="col-span-1 text-sm text-center grid-rows-2">
               <p>Additional Services </p>
-              <p>Nội</p>
+              <p className="p-1 bg-gray-300" style={{ width: '50%', margin: '0 auto' }}>{trackingData.carrierCode}</p>
             </div>
           </div>
         </div>
@@ -175,51 +191,24 @@ function App() {
                   </tr>
                 </thead>
                 <tbody className="text-xs text-gray-700 uppercase bg-gray-50 color-131466 border border-collapse border-gray-300 rounded-md">
-                  <tr className="color-131466">
-                    <th className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
-                      1
-                    </th>
-                    <td className="px-6 py-2">11:25 Thur 19 Dec 2022</td>
-                    <td className="px-6 py-2">Package 1</td>
-                    <td className="px-6 py-2">Barcode #123</td>
-                    <td className="px-6 py-2">5x5x5</td>
-                    <td className="px-6 py-2">12lb</td>
-                    <td className="px-6 py-2 text-right">
-                      <div className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                        Edit
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="color-131466">
-                    <th className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
-                      1
-                    </th>
-                    <td className="px-6 py-2">11:25 Thur 19 Dec 2022</td>
-                    <td className="px-6 py-2">Package 1</td>
-                    <td className="px-6 py-2">Barcode #123</td>
-                    <td className="px-6 py-2">5x5x5</td>
-                    <td className="px-6 py-2">12lb</td>
-                    <td className="px-6 py-2 text-right">
-                      <div className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                        Edit
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="color-131466">
-                    <th className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
-                      1
-                    </th>
-                    <td className="px-6 py-2">11:25 Thur 19 Dec 2022</td>
-                    <td className="px-6 py-2">Package 1</td>
-                    <td className="px-6 py-2">Barcode #123</td>
-                    <td className="px-6 py-2">5x5x5</td>
-                    <td className="px-6 py-2">12lb</td>
-                    <td className="px-6 py-2 text-right">
-                      <div className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                        Edit
-                      </div>
-                    </td>
-                  </tr>
+                {trackingData.histories &&
+                    trackingData.histories.map((history, index) => (
+                      <tr key={index} className="color-131466">
+                        <th className="px-6 py-2 font-medium text-gray-900 whitespace-nowrap">
+                          {index + 1}
+                        </th>
+                        <td className="px-6 py-2">{formatTime(history.date)}</td>
+                        <td className="px-6 py-2">{history.eventDescription}</td>
+                        <td className="px-6 py-2">{history.scanLocation.city + ', ' + history.scanLocation.stateOrProvinceCode}</td>
+                        <td className="px-6 py-2">Pending</td>
+                        <td className="px-6 py-2">Pending</td>
+                        <td className="px-6 py-2 text-right">
+                          <div className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                            Edit
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
